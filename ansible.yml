@@ -1,15 +1,9 @@
-- name: Restart Jenkins to make the plugin data available
-  service: name=jenkins state=restarted
-
-- name: Wait for Jenkins to restart
-  wait_for:
-    host=localhost
-    port=8080
-    delay=20
-    timeout=300
-
-- name: Install Jenkins plugins
-  command:
-    java -jar {{ jenkins_cli_jar }} -s {{ jenkins_dashboard_url }} install-plugin {{ item }}
-    creates=/var/lib/jenkins/plugins/{{ item }}.jpi
-  with_items: jenkins_plugins
+- name: wait for service to boot
+  uri:
+    url: "https://35.239.124.76:8080"
+    status_code: 200
+    validate_certs: False
+  register: result
+  until: result | succeeded
+  retries: 8
+  delay: 20
